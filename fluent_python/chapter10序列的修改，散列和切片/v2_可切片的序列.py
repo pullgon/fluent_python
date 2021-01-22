@@ -5,6 +5,9 @@
 import math
 import reprlib
 import numbers
+import functools
+import operator
+import itertools
 from array import array
 
 
@@ -73,7 +76,12 @@ class Vector:
         return bytes([ord(self.type_code)]) + bytes(self._components)
 
     def __eq__(self, other):
-        return tuple(self) == tuple(other)
+        return len(self) == len(other) and all(a == b for a, b in zip(self, other))
+
+    def __hash__(self):
+        # hashes = (hash(x) for x in self._components)
+        hashes = map(hash, self._components)
+        return functools.reduce(operator.xor, hashes)
 
     def __abs__(self):
         # 不能使用 hypot(平方根) 方法了，因此我们先计算各分量的平方之和，然后再使用 sqrt 方法开平方。
@@ -81,6 +89,31 @@ class Vector:
 
     def __bool__(self):
         return bool(abs(self))
+
+    def angle(self, n):
+        """计算n纬球体中的某个角坐标"""
+        r = math.sqrt(sum(x * x for x in self[n:]))
+        a = math.atan2(r, self[n - 1])
+        if (n == len(self) - 1) and self[-1] < 0:
+            return math.pi * 2 - a
+        else:
+            return a
+
+    def angles(self):
+        """"""
+        return (self.angle(n) for n in range(1, len(self)))
+
+    def __format__(self, format_spec=''):
+        if format_spec.endswith('h'):  # h 这里为n维球坐标的标识
+            format_spec = format_spec[:-1]
+            # 使用 itertools.chain 函数生成生成器表达式，无缝迭代向量的模和各个角坐标。
+            coords = itertools.chain([abs(self)], self.angles())
+            out_fmt = '<{}>'  # 使用尖括号显示球面坐标
+        else:
+            coords = self
+            out_fmt = '({})'  # 使用圆括号显示笛卡儿坐标
+        components = (format(c, format_spec) for c in coords)
+        return out_fmt.format(', '.join(components))
 
     @classmethod
     def frombytes(cls, b):
@@ -91,16 +124,23 @@ class Vector:
 
 
 if __name__ == '__main__':
-    v = Vector(range(5))
-    print(repr(v))  # Vector([0.0, 1.0, 2.0, 3.0, 4.0])
-    print(v.x)  # 0.0
+    # v = Vector([1, 2, 3, 4])
+    # print(format(v))
+    # print(format(v, 'h'))
+    # (1.0, 2.0, 3.0, 4.0)
+    # <5.477225575051661, 1.387192316515978, 1.1902899496825317, 0.9272952180016122>
 
-    try:
-        v.x = 10
-    except AttributeError as e:
-        print(e)  # readonly attribute 'x'
+    # v2 = Vector(range(5))
+    # print(format(v2))
+    # print(format(v2, '.2f'))
+    # print(format(v2, '.3eh'))
+    # print(format(v2, '.5fh'))
+    # (0.0, 1.0, 2.0, 3.0, 4.0)
+    # (0.00, 1.00, 2.00, 3.00, 4.00)
+    # <5.477e+00, 1.571e+00, 1.387e+00, 1.190e+00, 9.273e-01>
+    # <5.47723, 1.57080, 1.38719, 1.19029, 0.92730>
 
-    try:
-        v.c = 1
-    except AttributeError as e:
-        print(e)  # can't set attributes 'a' to 'z' in 'Vector'
+    print(hash(Vector([1, 3])))  # 2
+    print(hash(Vector([3.1, 4.2])))  # 384307168202284039
+    print(hash(Vector(range(6))))  # 1
+
