@@ -9,27 +9,21 @@ import weakref
 import objgraph
 
 
-class A:
-    pass
+class Pizza:
+    def __init__(self, ingredients):
+        self.ingredients = ingredients
 
+    def __repr__(self):
+        return f'Pizza({self.ingredients!r})'
 
-class B:
-    pass
+    @classmethod
+    def margherita(cls):
+        return cls(['mozzarella', 'tomatoes'])
 
-
-def bye():
-    print("bye bye!")
+    @classmethod
+    def prosciutto(cls):
+        return cls(['mozzarella', 'tomatoes', 'ham'])
 
 
 if __name__ == '__main__':
-    a = A()
-    b = B()
-    print(objgraph.count('A'))
-    ender = weakref.finalize(a, bye)
-    print(ender.alive)
-    a.name = b
-    b.dsa = a
-    del a
-    del b
-    print(objgraph.count('A'))
-
+    pass
