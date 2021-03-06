@@ -24,6 +24,11 @@ class Pizza:
     def prosciutto(cls):
         return cls(['mozzarella', 'tomatoes', 'ham'])
 
+    @staticmethod
+    def test():
+        print("--")
+
 
 if __name__ == '__main__':
-    pass
+    a = Pizza(1)
+    a.test()
