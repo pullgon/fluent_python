@@ -5,5 +5,10 @@
 
 from django.db import models
 
-if __name__ == '__main__':
-    pass
+
+class BookInfo(models.Model):
+    """图书模型类"""
+    # 图书名称
+    title = models.CharField(max_length=20)  # 字符串，最大长度为20
+    # 出版日期
+    pub_date = models.DateField()
