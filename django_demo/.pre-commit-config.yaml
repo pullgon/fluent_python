@@ -1,8 +1,8 @@
 repos:
-#  - repo: git://github.com/pre-commit/pre-commit-hooks
-#    rev: v2.3.0
-#    hooks:
-#      - id: flake8
+  - repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: flake8
   - repo: git://github.com/psf/black
     rev: 19.3b0
     hooks:
